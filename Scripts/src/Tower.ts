@@ -1,4 +1,4 @@
-import { Board, BlockPosition } from "../../Board.js";
+import { Board, BlockPosition } from "./Board.js";
 import { BasePiece } from "../Abstract/BasePiece.js";
 
 export class Tower extends BasePiece {

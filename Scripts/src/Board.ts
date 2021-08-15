@@ -1,5 +1,4 @@
-import { IPiece } from "./Scripts/Interfaces/Piece.js"
-import { BoardConfiguration } from "./Scripts/src/BoardConfig.js"
+import { IPiece } from "../Interfaces/Piece.js"
 
 export type BlockPosition = { x: number, y: number }
 
@@ -13,7 +12,7 @@ export class Board {
 
     private pieces: Map<IPiece, BlockPosition> = new Map<IPiece, BlockPosition>();
 
-    constructor(config: BoardConfiguration, color1: string, color2: string) {
+    constructor(color1: string, color2: string) {
         this.color1 = color1;
         this.color2 = color2;
     }

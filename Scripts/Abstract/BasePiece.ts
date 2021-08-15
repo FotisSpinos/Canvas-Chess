@@ -1,4 +1,4 @@
-import { Board, BlockPosition } from "../../Board.js";
+import { Board, BlockPosition } from "../src/Board.js";
 import {IPiece} from "./../Interfaces/Piece.js"
 
 export abstract class BasePiece implements IPiece{

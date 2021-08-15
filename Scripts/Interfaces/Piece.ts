@@ -1,4 +1,4 @@
-import { Board, BlockPosition } from "../../Board.js";
+import { Board, BlockPosition } from "../src/Board.js";
 
 export interface IPiece {
     getValidMoves(board: Board) : BlockPosition[]

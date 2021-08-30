@@ -1,6 +1,6 @@
 import { IPiece } from "../Interfaces/Piece.js"
 
-export type BlockPosition = { x: number, y: number }
+export type BoardPosition = { x: number, y: number }
 
 export class Board {
     private color1: string
@@ -10,7 +10,7 @@ export class Board {
     public squareSize: number
     public ctx: CanvasRenderingContext2D
 
-    private pieces: Map<IPiece, BlockPosition> = new Map<IPiece, BlockPosition>();
+    private pieces: Map<IPiece, string> = new Map<IPiece, string>();
 
     constructor(color1: string, color2: string) {
         this.color1 = color1;
@@ -53,7 +53,7 @@ export class Board {
             throw Error('invalid block')
         }
         piece.draw(this, x, y);
-        this.pieces.set(piece, { x, y });
+        this.pieces.set(piece, JSON.stringify({ x, y }));
     }
 
     public setColor(x: number, y: number, color: string) {
@@ -66,25 +66,39 @@ export class Board {
         }
     }
 
-    public setColorToBlocks(blocks: BlockPosition[], color: string) {
+    public setColorToBlocks(blocks: BoardPosition[], color: string) {
         blocks.forEach(x => {
             this.setColor(x.x, x.y, color);
         })
     }
 
-    public getValidPiecePosition(piece: IPiece): BlockPosition {
+    public getValidPiecePosition(piece: IPiece): BoardPosition {
         if (this.pieces.get(piece) != null) {
-            return this.pieces.get(piece)
+            return JSON.parse(this.pieces.get(piece))
         }
         throw Error('Piece could not be found')
     }
 
-    public getPawnPositions(): Set<String> {
-        let set = new Set<String>();
+    public getPieceAtPos(boardPosition: BoardPosition): IPiece {
+        this.pieces.forEach((value, key) => {
+            if (this.getValidPiecePosition(key) == boardPosition)
+                return key;
+        })
 
-        this.pieces.forEach(x => set.add(JSON.stringify(x)))
+        return null;
+    }
 
-        return set;
+    public isPawnPosition(boardPosition: BoardPosition) {
+        // create hash set of positions
+        let set = new Set<string>();
+
+        this.pieces.forEach((x, y) => {
+            set.add(x)
+        });
+
+        let boardPosString = JSON.stringify(boardPosition);
+
+        return set.has(boardPosString);
     }
 
     private drawBlockWithColor(x: number, y: number, color: string) {

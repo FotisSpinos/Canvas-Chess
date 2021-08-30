@@ -17,7 +17,7 @@ export class Board {
         this.color2 = color2;
     }
 
-    public drawBoard(ctx: CanvasRenderingContext2D, resolution: number, size: number) {
+    public drawBoard(ctx: CanvasRenderingContext2D, resolution: number, size: number): void {
         this.resolution = resolution
         this.squareSize = (size / resolution)
         this.ctx = ctx;
@@ -48,7 +48,7 @@ export class Board {
         }
     }
 
-    public addPeace(piece: IPiece, x: number, y: number) {
+    public addPeace(piece: IPiece, x: number, y: number): void {
         if (!this.isValidBlock(x, y)) {
             throw Error('invalid block')
         }
@@ -56,7 +56,7 @@ export class Board {
         this.pieces.set(piece, JSON.stringify({ x, y }));
     }
 
-    public setColor(x: number, y: number, color: string) {
+    public setColor(x: number, y: number, color: string): void {
         if (this.isValidBlock(x, y)) {
             this.ctx.fillStyle = color
             this.ctx.fillRect(this.squareSize * x, this.squareSize * y, this.squareSize, this.squareSize);
@@ -66,10 +66,14 @@ export class Board {
         }
     }
 
-    public setColorToBlocks(blocks: BoardPosition[], color: string) {
+    public setColorToBlocks(blocks: BoardPosition[], color: string): void {
         blocks.forEach(x => {
-            this.setColor(x.x, x.y, color);
+            this.setColorAtPosisition(x, color);
         })
+    }
+
+    public setColorAtPosisition(boardPos: BoardPosition, color: string): void {
+        this.setColor(boardPos.x, boardPos.y, color);
     }
 
     public getValidPiecePosition(piece: IPiece): BoardPosition {
@@ -80,16 +84,20 @@ export class Board {
     }
 
     public getPieceAtPos(boardPosition: BoardPosition): IPiece {
+
+        let piece: IPiece = null
+
         this.pieces.forEach((value, key) => {
-            if (this.getValidPiecePosition(key) == boardPosition)
-                return key;
+            let currentPiecePos = this.getValidPiecePosition(key);
+
+            if (JSON.stringify(currentPiecePos) == JSON.stringify(boardPosition))
+                piece = key;
         })
 
-        return null;
+        return piece;
     }
 
-    public isPawnPosition(boardPosition: BoardPosition) {
-        // create hash set of positions
+    public isPawnPosition(boardPosition: BoardPosition): boolean {
         let set = new Set<string>();
 
         this.pieces.forEach((x, y) => {
@@ -101,7 +109,7 @@ export class Board {
         return set.has(boardPosString);
     }
 
-    private drawBlockWithColor(x: number, y: number, color: string) {
+    private drawBlockWithColor(x: number, y: number, color: string): void {
         this.ctx.fillStyle = color
         this.ctx.fillRect(this.squareSize * x, this.squareSize * y, this.squareSize, this.squareSize);
     }

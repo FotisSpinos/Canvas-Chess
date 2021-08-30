@@ -1,9 +1,8 @@
 import { Board, BoardPosition } from "./Board.js";
 import { BasePiece } from "../Abstract/BasePiece.js";
-import {IPiece} from "./../Interfaces/Piece.js"
+import { IPiece } from "./../Interfaces/Piece.js"
 
 export class Tower extends BasePiece {
-    
     private image: HTMLImageElement
 
     constructor(src: string) {
@@ -26,7 +25,7 @@ export class Tower extends BasePiece {
 
             if (board.isPawnPosition(pos)) {
                 let piece: IPiece = board.getPieceAtPos(pos);
-                if(piece != null){
+                if (piece != null && piece != this) {
                     attackingPieces.push(piece);
                     break;
                 }
@@ -39,7 +38,7 @@ export class Tower extends BasePiece {
 
             if (board.isPawnPosition(pos)) {
                 let piece: IPiece = board.getPieceAtPos(pos);
-                if(piece != null){
+                if (piece != null && piece != this) {
                     attackingPieces.push(piece);
                     break;
                 }
@@ -52,7 +51,7 @@ export class Tower extends BasePiece {
 
             if (board.isPawnPosition(pos)) {
                 let piece: IPiece = board.getPieceAtPos(pos);
-                if(piece != null){
+                if (piece != null && piece != this) {
                     attackingPieces.push(piece);
                     break;
                 }
@@ -65,7 +64,7 @@ export class Tower extends BasePiece {
 
             if (board.isPawnPosition(pos)) {
                 let piece: IPiece = board.getPieceAtPos(pos);
-                if(piece != null){
+                if (piece != null && piece != this) {
                     attackingPieces.push(piece);
                     break;
                 }
@@ -78,7 +77,7 @@ export class Tower extends BasePiece {
     public getValidMoves(board: Board): BoardPosition[] {
         let validMoves: BoardPosition[] = [];
         let currentPosition = board.getValidPiecePosition(this)
-        
+
         // add top
         for (let i = currentPosition.y - 1; i >= 0; i--) {
             const pos = { x: currentPosition.x, y: i };

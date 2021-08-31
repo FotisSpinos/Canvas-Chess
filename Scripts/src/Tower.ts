@@ -47,7 +47,7 @@ export class Tower extends BasePiece {
 
         // add left
         for (let i = currentPosition.x - 1; i >= 0; i--) {
-            const pos = { x: currentPosition.x, y: i };
+            const pos = { x: i, y: currentPosition.y };
 
             if (board.isPawnPosition(pos)) {
                 let piece: IPiece = board.getPieceAtPos(pos);
@@ -60,7 +60,7 @@ export class Tower extends BasePiece {
 
         // add right
         for (let i = currentPosition.x + 1; i < board.resolution; i++) {
-            const pos = { x: currentPosition.x, y: i };
+            const pos = { x: i, y: currentPosition.y };
 
             if (board.isPawnPosition(pos)) {
                 let piece: IPiece = board.getPieceAtPos(pos);

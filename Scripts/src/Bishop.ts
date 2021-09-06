@@ -10,8 +10,8 @@ export class Tower extends BasePiece {
         this.image.src = src
     }
 
-    draw(board: Board, x: number, y: number): void {
-        this.drawImage(this.image, board, x, y);
+    draw(board: Board, pos: BoardPosition): void {
+        this.drawImage(this.image, board, pos.x, pos.y);
     }
 
     getValidMoves(board: Board): BoardPosition[] {

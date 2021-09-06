@@ -5,7 +5,7 @@ export abstract class BasePiece implements IPiece{
     
     abstract getValidMoves(board: Board): BoardPosition[];
 
-    abstract draw(board: Board, x: number, y: number): void;
+    abstract draw(board: Board, pos: BoardPosition): void;
     
     protected drawImage(image: HTMLImageElement, board: Board, x: number, y: number): void {
         image.onload = () => {

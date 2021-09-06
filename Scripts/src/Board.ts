@@ -48,21 +48,28 @@ export class Board {
         }
     }
 
-    public addPeace(piece: IPiece, x: number, y: number): void {
-        if (!this.isValidBlock(x, y)) {
-            throw Error('invalid block')
-        }
-        piece.draw(this, x, y);
-        this.pieces.set(piece, JSON.stringify({ x, y }));
+    public drawPeaces() {
+        this.pieces.forEach((value, key) => {
+            let piece: IPiece = key
+            let piecePos: BoardPosition = JSON.parse(value);
+            piece.draw(this, piecePos);
+        })
     }
 
-    public setColor(x: number, y: number, color: string): void {
-        if (this.isValidBlock(x, y)) {
+    public addPeace(piece: IPiece, pos: BoardPosition): void {
+        if (!this.isValidBoardPosition(pos)) {
+            throw Error('invalid block')
+        }
+        this.pieces.set(piece, JSON.stringify(pos));
+    }
+
+    public setColor(pos: BoardPosition, color: string): void {
+        if (this.isValidBoardPosition(pos)) {
             this.ctx.fillStyle = color
-            this.ctx.fillRect(this.squareSize * x, this.squareSize * y, this.squareSize, this.squareSize);
+            this.ctx.fillRect(this.squareSize * pos.x, this.squareSize * pos.y, this.squareSize, this.squareSize);
         }
         else {
-            throw Error('block is not valid' + x + ' ' + y);
+            throw Error('block is not valid' + pos.x + ' ' + pos.y);
         }
     }
 
@@ -72,8 +79,8 @@ export class Board {
         })
     }
 
-    public setColorAtPosisition(boardPos: BoardPosition, color: string): void {
-        this.setColor(boardPos.x, boardPos.y, color);
+    public setColorAtPosisition(pos: BoardPosition, color: string): void {
+        this.setColor(pos, color);
     }
 
     public getValidPiecePosition(piece: IPiece): BoardPosition {
@@ -84,7 +91,6 @@ export class Board {
     }
 
     public getPieceAtPos(boardPosition: BoardPosition): IPiece {
-
         let piece: IPiece = null
 
         this.pieces.forEach((value, key) => {
@@ -109,12 +115,51 @@ export class Board {
         return set.has(boardPosString);
     }
 
+    public createCopyBoard(): Board {
+        let board = new Board(this.color1, this.color2);
+        board.color1 = this.color1;
+        board.color2 = this.color2;
+        board.ctx = this.ctx;
+        board.resolution = this.resolution;
+        board.squareSize = this.squareSize;
+
+        // copy pieces
+        let pieces = new Map<IPiece, string>();
+        this.pieces.forEach((value, key) => {
+            pieces.set(key, value);
+        })
+        board.pieces = pieces
+
+        return board;
+    }
+
+    public movePieceAtEmptyBoardPos(piece: IPiece, boardPosition: BoardPosition): boolean {
+        let isValidPos = this.isValidBoardPosition(boardPosition);
+        let pieceExistsAtPos = this.isPawnPosition(boardPosition);
+        let canMove = isValidPos && pieceExistsAtPos;
+
+
+        if (canMove) {
+            let isAdded = this.pieces.has(piece);
+
+            if (!isAdded) {
+                this.addPeace(piece, boardPosition);
+            }
+            else {
+                this.pieces.delete(piece);
+                this.addPeace(piece, boardPosition)
+            }
+        }
+
+        return canMove;
+    }
+
     private drawBlockWithColor(x: number, y: number, color: string): void {
         this.ctx.fillStyle = color
         this.ctx.fillRect(this.squareSize * x, this.squareSize * y, this.squareSize, this.squareSize);
     }
 
-    private isValidBlock(x: number, y: number): boolean {
-        return (x > -1 && x < this.resolution && y > -1 && y < this.resolution)
+    private isValidBoardPosition(pos: BoardPosition): boolean {
+        return (pos.x > -1 && pos.x < this.resolution && pos.y > -1 && pos.y < this.resolution)
     }
 }

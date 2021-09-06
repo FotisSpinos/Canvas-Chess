@@ -11,8 +11,8 @@ export class Tower extends BasePiece {
         this.image.src = src
     }
 
-    public draw(board: Board, x: number, y: number): void {
-        this.drawImage(this.image, board, x, y);
+    public draw(board: Board, pos: BoardPosition): void {
+        this.drawImage(this.image, board, pos.x, pos.y);
     }
 
     public getAttackingPeace(board: Board): IPiece[] {

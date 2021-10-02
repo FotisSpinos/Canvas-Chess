@@ -9,12 +9,23 @@ export class Board {
     public resolution: number
     public squareSize: number
     public ctx: CanvasRenderingContext2D
-
+    
     private pieces: Map<IPiece, string> = new Map<IPiece, string>();
 
     constructor(color1: string, color2: string) {
         this.color1 = color1;
         this.color2 = color2;
+    }
+
+    public getPieces(): IPiece[]
+    {
+        let pieces : IPiece[] = [];
+
+        this.pieces.forEach((pos, piece) => {
+            pieces.push(piece);
+        });
+
+        return pieces;
     }
 
     public drawBoard(ctx: CanvasRenderingContext2D, resolution: number, size: number): void {
@@ -115,7 +126,7 @@ export class Board {
         return set.has(boardPosString);
     }
 
-    public createCopyBoard(): Board {
+    public deepCopy(): Board {
         let board = new Board(this.color1, this.color2);
         board.color1 = this.color1;
         board.color2 = this.color2;

@@ -59,7 +59,7 @@ export class Board {
         }
     }
 
-    public drawPeaces() {
+    public drawPieces() {
         this.pieces.forEach((value, key) => {
             let piece: IPiece = key
             let piecePos: BoardPosition = JSON.parse(value);
@@ -67,7 +67,7 @@ export class Board {
         })
     }
 
-    public addPeace(piece: IPiece, pos: BoardPosition): void {
+    public addPiece(piece: IPiece, pos: BoardPosition): void {
         if (!this.isValidBoardPosition(pos)) {
             throw Error('invalid block')
         }
@@ -154,11 +154,11 @@ export class Board {
             let isAdded = this.pieces.has(piece);
 
             if (!isAdded) {
-                this.addPeace(piece, boardPosition);
+                this.addPiece(piece, boardPosition);
             }
             else {
                 this.pieces.delete(piece);
-                this.addPeace(piece, boardPosition)
+                this.addPiece(piece, boardPosition)
             }
         }
 

@@ -135,11 +135,9 @@ export class Board {
         board.squareSize = this.squareSize;
 
         // copy pieces
-        let pieces = new Map<IPiece, string>();
         this.pieces.forEach((value, key) => {
-            pieces.set(key, value);
+            board.pieces.set(key, value);
         })
-        board.pieces = pieces
 
         return board;
     }
@@ -147,7 +145,7 @@ export class Board {
     public movePieceAtEmptyBoardPos(piece: IPiece, boardPosition: BoardPosition): boolean {
         let isValidPos = this.isValidBoardPosition(boardPosition);
         let pieceExistsAtPos = this.isPawnPosition(boardPosition);
-        let canMove = isValidPos && pieceExistsAtPos;
+        let canMove = isValidPos && !pieceExistsAtPos;
 
 
         if (canMove) {
@@ -160,6 +158,9 @@ export class Board {
                 this.pieces.delete(piece);
                 this.addPiece(piece, boardPosition)
             }
+        }
+        else{
+            
         }
 
         return canMove;

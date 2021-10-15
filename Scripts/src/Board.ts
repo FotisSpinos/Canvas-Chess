@@ -35,7 +35,7 @@ export class Board {
         this.squareSize = (size / resolution)
     }
 
-    public drawBoard(ctx: CanvasRenderingContext2D) {
+    public drawBoard() {
         for (let y = 0; y < this.resolution; y++) {
             for (let x = 0; x < this.resolution; x++) {
                 this.drawBlockWithColor(x, y, this.GetColorForBlock({x, y}))
@@ -48,7 +48,7 @@ export class Board {
             image.src = piece.pieceType.imgPath
 
             image.onload = () => {
-                ctx.drawImage(image, this.squareSize * pos.x, this.squareSize * pos.y, this.squareSize, this.squareSize)
+                this.ctx.drawImage(image, this.squareSize * pos.x, this.squareSize * pos.y, this.squareSize, this.squareSize)
             }
         })
     }

@@ -1,9 +1,9 @@
-import { Board, BlockPosition } from "../src/Board.js";
+import { Board, BoardPosition } from "../src/Board.js";
 import {IPiece} from "./../Interfaces/Piece.js"
 
 export abstract class BasePiece implements IPiece{
     
-    abstract getValidMoves(board: Board): BlockPosition[];
+    abstract getValidMoves(board: Board): BoardPosition[];
 
     abstract draw(board: Board, x: number, y: number): void;
 

@@ -2,11 +2,13 @@ export type BoardPosition = { x: number, y: number }
 
 export class PieceType {
     public imgPath: string
-    public getValidMoves:(pos: BoardPosition, boardSize: number, piecePositions: Set<BoardPosition>) => BoardPosition[] 
+    public getValidMoves:(piece: Piece, board: Board) => BoardPosition[] 
+    public getAttackingPieces: (piece: Piece, board: Board) => Piece[]
 
-    constructor(imgPath: string, getValidMoves: (pos: BoardPosition, boardSize: number, piecePositions: Set<BoardPosition>) => BoardPosition[]) {
+    constructor(imgPath: string, getValidMoves: (piece: Piece, board: Board) => BoardPosition[], getAttackingPieces: (piece: Piece, board: Board) => Piece[]) {
         this.imgPath = imgPath
         this.getValidMoves = getValidMoves
+        this.getAttackingPieces = getAttackingPieces
     }
 }
 
@@ -119,15 +121,7 @@ export class Board {
     }
 
     public highlightValidMoves(piece: Piece, color: string) {
-        let piecePos = this.getPiecePos(piece)
-        let piecePositions = new Set<BoardPosition>()
-
-        this.pieces.forEach((currentPiece, currentStringPos) => {
-            piecePositions.add(JSON.parse(currentStringPos))
-        })
-
-        let validMoves = piece.pieceType.getValidMoves(piecePos, this.resolution, piecePositions)
-
+        let validMoves = piece.pieceType.getValidMoves(piece, this)
         this.drawblocksWithColor(validMoves, color)
     }
 
@@ -160,21 +154,21 @@ export class Board {
     }
 }
 
-export function getTowerMoves(pos: BoardPosition, boardSize: number, piecePositions: Set<BoardPosition>): BoardPosition[] {
+export function getTowerMoves(piece: Piece, board: Board): BoardPosition[] {
     
     let validMoves: BoardPosition[] = [];
-    let stringPiecePositions = new Set<string>() 
 
-    piecePositions.forEach(pos => {
-        stringPiecePositions.add(JSON.stringify(pos))
-    })
+    let pos = board.getPiecePos(piece)
+    let boardSize = board.resolution
 
     // add top
     for (let i = pos.y - 1; i >= 0; i--) {
         const currentPos = { x: pos.x, y: i };
 
-        if (stringPiecePositions.has(JSON.stringify(currentPos)))
+        if (board.pieces.has(JSON.stringify(currentPos))){
+            validMoves.push(currentPos)
             break;
+        }
 
         validMoves.push(currentPos)
     }
@@ -183,8 +177,10 @@ export function getTowerMoves(pos: BoardPosition, boardSize: number, piecePositi
     for (let i = pos.y + 1; i < boardSize; i++) {
         const currentPos = { x: pos.x, y: i };
 
-        if (stringPiecePositions.has(JSON.stringify(currentPos)))
+        if (board.pieces.has(JSON.stringify(currentPos))){
+            validMoves.push(currentPos)
             break;
+        }
 
         validMoves.push(currentPos)
     }
@@ -193,8 +189,10 @@ export function getTowerMoves(pos: BoardPosition, boardSize: number, piecePositi
     for (let i = pos.x - 1; i >= 0; i--) {
         const currentPos = { x: i, y: pos.y };
 
-        if (stringPiecePositions.has(JSON.stringify(currentPos)))
+        if (board.pieces.has(JSON.stringify(currentPos))){
+            validMoves.push(currentPos)
             break;
+        }
 
         validMoves.push(currentPos)
     }
@@ -203,8 +201,10 @@ export function getTowerMoves(pos: BoardPosition, boardSize: number, piecePositi
     for (let i = pos.x + 1; i < boardSize; i++) {
         const currentPos = { x: i, y: pos.y };
 
-        if (stringPiecePositions.has(JSON.stringify(currentPos)))
+        if (board.pieces.has(JSON.stringify(currentPos))){
+            validMoves.push(currentPos)
             break;
+        }
 
         validMoves.push(currentPos)
     }

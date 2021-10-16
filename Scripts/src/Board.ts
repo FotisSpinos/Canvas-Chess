@@ -3,12 +3,10 @@ export type BoardPosition = { x: number, y: number }
 export class PieceType {
     public imgPath: string
     public getValidMoves:(piece: Piece, board: Board) => BoardPosition[] 
-    public getAttackingPieces: (piece: Piece, board: Board) => Piece[]
 
-    constructor(imgPath: string, getValidMoves: (piece: Piece, board: Board) => BoardPosition[], getAttackingPieces: (piece: Piece, board: Board) => Piece[]) {
+    constructor(imgPath: string, getValidMoves: (piece: Piece, board: Board) => BoardPosition[]) {
         this.imgPath = imgPath
         this.getValidMoves = getValidMoves
-        this.getAttackingPieces = getAttackingPieces
     }
 }
 
@@ -118,6 +116,40 @@ export class Board {
             }
         })
         return boardPos;
+    }
+
+    public getAttackingPieces(piece: Piece): Piece[] {
+        let validMoves: BoardPosition[] = piece.pieceType.getValidMoves(piece, this)
+        let attackingPieces: Piece[] = []
+        
+        validMoves.forEach(movePos => {
+            let stringPos = JSON.stringify(movePos)
+            if(this.pieces.has(stringPos)){
+                attackingPieces.push(this.pieces.get(stringPos))
+            }
+        })
+
+        return attackingPieces;
+    }
+
+    public getAttackingPositions(piece: Piece): BoardPosition[] {
+        let validMoves: BoardPosition[] = piece.pieceType.getValidMoves(piece, this)
+        let attackingPositions: BoardPosition[] = []
+
+        validMoves.forEach(movePos => {
+            let stringPos = JSON.stringify(movePos)
+
+            if(this.pieces.has(stringPos)){
+                attackingPositions.push(movePos)
+            }
+        })
+
+        return attackingPositions;
+    }
+
+    public highlightAttackingPositions(piece: Piece, color: string): void {
+        let attackingPositions = this.getAttackingPositions(piece)
+        this.drawblocksWithColor(attackingPositions, color)
     }
 
     public highlightValidMoves(piece: Piece, color: string) {

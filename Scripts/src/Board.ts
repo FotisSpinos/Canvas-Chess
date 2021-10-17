@@ -1,3 +1,8 @@
+function copyPiece(piece: Piece) : Piece {
+    let copyPiece = new Piece(piece.pieceType)
+    return copyPiece
+}
+
 export type BoardPosition = { x: number, y: number }
 
 export class PieceType {
@@ -33,6 +38,24 @@ export class Board {
         this.color2 = 'blue'
         this.resolution = resolution
         this.squareSize = (size / resolution)
+    }
+
+    public copy(): Board {
+        let copyBoard = new Board(this.resolution, this.squareSize, this.ctx)
+        copyBoard.color1 = this.color1
+        copyBoard.color2 = this.color2
+        copyBoard.squareSize = this.squareSize
+
+        let copyPosToPieceMap = new Map<string, Piece>()
+
+        this.posToPieceMap.forEach((piece, stringPos) => {
+            let newPiece = copyPiece(piece)
+            copyPosToPieceMap.set(stringPos, newPiece)
+        })
+        
+        copyBoard.posToPieceMap = copyPosToPieceMap
+
+        return copyBoard
     }
 
     public drawBoard(): void {

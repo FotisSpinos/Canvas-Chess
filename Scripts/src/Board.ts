@@ -184,6 +184,16 @@ export class Board {
         this.drawblocksWithColor(validMoves, color)
     }
 
+    public getPieces(): Piece[] {
+        let pieces = []
+        this.posToPieceMap.forEach(piece => {
+
+            pieces.push(piece)
+        })
+
+        return pieces
+    }
+
     private isValidBlock(x: number, y: number): boolean {
         return (x > -1 && x < this.resolution && y > -1 && y < this.resolution)
     }

@@ -22,8 +22,8 @@ export class Board {
     public resolution: number
     public squareSize: number
     public ctx: CanvasRenderingContext2D
-    public pieces: Map<string, Piece> = new Map<string, Piece>()
     
+    private posToPieceMap: Map<string, Piece> = new Map<string, Piece>()
     private color1: string
     private color2: string
 
@@ -35,14 +35,14 @@ export class Board {
         this.squareSize = (size / resolution)
     }
 
-    public drawBoard() {
+    public drawBoard(): void {
         for (let y = 0; y < this.resolution; y++) {
             for (let x = 0; x < this.resolution; x++) {
                 this.drawBlockWithColor(x, y, this.GetColorForBlock({x, y}))
             }
         }
 
-        this.pieces.forEach((piece, stringPos) => {
+        this.posToPieceMap.forEach((piece, stringPos) => {
             let pos: BoardPosition = JSON.parse(stringPos)
             let image = new Image()
             image.src = piece.pieceType.imgPath
@@ -53,12 +53,12 @@ export class Board {
         })
     }
 
-    public setColors(oddColor: string, evenColor: string) {
+    public setColors(oddColor: string, evenColor: string): void {
         this.color1 = oddColor
         this.color2 = evenColor
     }
 
-    public drawBlockWithColor(x: number, y: number, color: string) {
+    public drawBlockWithColor(x: number, y: number, color: string): void {
         if (this.isValidBlock(x, y)) {
             this.ctx.fillStyle = color
             this.ctx.fillRect(this.squareSize * x, this.squareSize * y, this.squareSize, this.squareSize)
@@ -68,7 +68,7 @@ export class Board {
         }
     }
 
-    public drawblocksWithColor(blocks: BoardPosition[], color: string) {
+    public drawblocksWithColor(blocks: BoardPosition[], color: string): void {
         blocks.forEach(x => {
             this.drawBlockWithColor(x.x, x.y, color)
         })
@@ -76,27 +76,27 @@ export class Board {
 
     public addPiece(pieceType: PieceType, pos: BoardPosition): Piece {
         let stringPos = JSON.stringify(pos)
-        if(this.pieces.has(stringPos)) {
+        if(this.posToPieceMap.has(stringPos)) {
             throw new Error("piece already placed at position. Cannot add piece.");
         }
         let piece = new Piece(pieceType)
-        this.pieces.set(stringPos, piece)
+        this.posToPieceMap.set(stringPos, piece)
 
         return piece;
     }
 
     public movePiece(piece: Piece, pos: BoardPosition): boolean {
 
-        let boardPositions = this.pieces.keys()
+        let boardPositions = this.posToPieceMap.keys()
 
-        for(let i = 0; i < this.pieces.size; i++) {
+        for(let i = 0; i < this.posToPieceMap.size; i++) {
             let currentStringPos = boardPositions.next().value
-            let currentPiece = this.pieces.get(currentStringPos)
+            let currentPiece = this.posToPieceMap.get(currentStringPos)
 
             if(currentPiece == piece) {
-                this.pieces.delete(currentStringPos)
+                this.posToPieceMap.delete(currentStringPos)
 
-                this.pieces.set(JSON.stringify(pos), piece)
+                this.posToPieceMap.set(JSON.stringify(pos), piece)
                 return true
             }
         }
@@ -105,12 +105,12 @@ export class Board {
 
     public getPieceAtPos(pos: BoardPosition): Piece {
         let stringPos = JSON.stringify(pos)
-        return this.pieces.get(stringPos)
+        return this.posToPieceMap.get(stringPos)
     }
 
     public getPiecePos(piece: Piece): BoardPosition {
         let boardPos = null;
-        this.pieces.forEach((currentPiece, currentStringPos) => {
+        this.posToPieceMap.forEach((currentPiece, currentStringPos) => {
             if(currentPiece == piece){
                 boardPos = JSON.parse(currentStringPos)
             }
@@ -124,8 +124,8 @@ export class Board {
         
         validMoves.forEach(movePos => {
             let stringPos = JSON.stringify(movePos)
-            if(this.pieces.has(stringPos)){
-                attackingPieces.push(this.pieces.get(stringPos))
+            if(this.posToPieceMap.has(stringPos)) {
+                attackingPieces.push(this.posToPieceMap.get(stringPos))
             }
         })
 
@@ -139,7 +139,7 @@ export class Board {
         validMoves.forEach(movePos => {
             let stringPos = JSON.stringify(movePos)
 
-            if(this.pieces.has(stringPos)){
+            if(this.posToPieceMap.has(stringPos)){
                 attackingPositions.push(movePos)
             }
         })
@@ -147,12 +147,16 @@ export class Board {
         return attackingPositions;
     }
 
+    public getPosToPieceMap(): Map<string, Piece> {
+        return this.posToPieceMap;
+    }
+
     public highlightAttackingPositions(piece: Piece, color: string): void {
         let attackingPositions = this.getAttackingPositions(piece)
         this.drawblocksWithColor(attackingPositions, color)
     }
 
-    public highlightValidMoves(piece: Piece, color: string) {
+    public highlightValidMoves(piece: Piece, color: string): void {
         let validMoves = piece.pieceType.getValidMoves(piece, this)
         this.drawblocksWithColor(validMoves, color)
     }
@@ -192,12 +196,13 @@ export function getTowerMoves(piece: Piece, board: Board): BoardPosition[] {
 
     let pos = board.getPiecePos(piece)
     let boardSize = board.resolution
+    let boardPosToPieces = board.getPosToPieceMap()
 
     // add top
     for (let i = pos.y - 1; i >= 0; i--) {
         const currentPos = { x: pos.x, y: i };
 
-        if (board.pieces.has(JSON.stringify(currentPos))){
+        if (boardPosToPieces.has(JSON.stringify(currentPos))){
             validMoves.push(currentPos)
             break;
         }
@@ -209,7 +214,7 @@ export function getTowerMoves(piece: Piece, board: Board): BoardPosition[] {
     for (let i = pos.y + 1; i < boardSize; i++) {
         const currentPos = { x: pos.x, y: i };
 
-        if (board.pieces.has(JSON.stringify(currentPos))){
+        if (boardPosToPieces.has(JSON.stringify(currentPos))){
             validMoves.push(currentPos)
             break;
         }
@@ -221,7 +226,7 @@ export function getTowerMoves(piece: Piece, board: Board): BoardPosition[] {
     for (let i = pos.x - 1; i >= 0; i--) {
         const currentPos = { x: i, y: pos.y };
 
-        if (board.pieces.has(JSON.stringify(currentPos))){
+        if (boardPosToPieces.has(JSON.stringify(currentPos))){
             validMoves.push(currentPos)
             break;
         }
@@ -233,7 +238,7 @@ export function getTowerMoves(piece: Piece, board: Board): BoardPosition[] {
     for (let i = pos.x + 1; i < boardSize; i++) {
         const currentPos = { x: i, y: pos.y };
 
-        if (board.pieces.has(JSON.stringify(currentPos))){
+        if (boardPosToPieces.has(JSON.stringify(currentPos))){
             validMoves.push(currentPos)
             break;
         }

@@ -109,14 +109,13 @@ export class Board {
     }
 
     public movePiece(piece: Piece, pos: BoardPosition): boolean {
-
         let boardPositions = this.posToPieceMap.keys()
 
         for(let i = 0; i < this.posToPieceMap.size; i++) {
             let currentStringPos = boardPositions.next().value
-            let currentPiece = this.posToPieceMap.get(currentStringPos)
-
-            if(currentPiece == piece) {
+            let isEmptySpace = this.getPieceAtPos(pos) == null 
+            
+            if(isEmptySpace) {
                 this.posToPieceMap.delete(currentStringPos)
 
                 this.posToPieceMap.set(JSON.stringify(pos), piece)
@@ -139,6 +138,10 @@ export class Board {
             }
         })
         return boardPos;
+    }
+
+    public getValidMoves(piece: Piece) {
+        piece.pieceType.getValidMoves(piece, this)
     }
 
     public getAttackingPieces(piece: Piece): Piece[] {
@@ -187,7 +190,6 @@ export class Board {
     public getPieces(): Piece[] {
         let pieces = []
         this.posToPieceMap.forEach(piece => {
-
             pieces.push(piece)
         })
 

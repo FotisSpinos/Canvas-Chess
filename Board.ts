@@ -6,11 +6,11 @@ function copyPiece(piece: Piece) : Piece {
 export type BoardPosition = { x: number, y: number }
 
 export class PieceType {
-    public imgPath: string
+    public image: HTMLImageElement
     public getValidMoves:(piece: Piece, board: Board) => BoardPosition[] 
 
-    constructor(imgPath: string, getValidMoves: (piece: Piece, board: Board) => BoardPosition[]) {
-        this.imgPath = imgPath
+    constructor(image: HTMLImageElement, getValidMoves: (piece: Piece, board: Board) => BoardPosition[]) {
+        this.image = image
         this.getValidMoves = getValidMoves
     }
 }
@@ -27,8 +27,9 @@ export class Board {
     public resolution: number
     public squareSize: number
     public ctx: CanvasRenderingContext2D
-    
+
     private posToPieceMap: Map<string, Piece> = new Map<string, Piece>()
+    private pieceTypeToImage: Map<PieceType, HTMLImageElement> = new Map<PieceType, HTMLImageElement>()
     private color1: string
     private color2: string
 
@@ -67,12 +68,7 @@ export class Board {
 
         this.posToPieceMap.forEach((piece, stringPos) => {
             let pos: BoardPosition = JSON.parse(stringPos)
-            let image = new Image()
-            image.src = piece.pieceType.imgPath
-
-            image.onload = () => {
-                this.ctx.drawImage(image, this.squareSize * pos.x, this.squareSize * pos.y, this.squareSize, this.squareSize)
-            }
+            this.ctx.drawImage(piece.pieceType.image, this.squareSize * pos.x, this.squareSize * pos.y, this.squareSize, this.squareSize)
         })
     }
 
@@ -98,6 +94,7 @@ export class Board {
     }
 
     public addPiece(pieceType: PieceType, pos: BoardPosition): Piece {
+
         let stringPos = JSON.stringify(pos)
         if(this.posToPieceMap.has(stringPos)) {
             throw new Error("piece already placed at position. Cannot add piece.");

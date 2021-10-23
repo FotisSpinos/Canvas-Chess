@@ -29,7 +29,6 @@ export class Board {
     public ctx: CanvasRenderingContext2D
 
     private posToPieceMap: Map<string, Piece> = new Map<string, Piece>()
-    private pieceTypeToImage: Map<PieceType, HTMLImageElement> = new Map<PieceType, HTMLImageElement>()
     private color1: string
     private color2: string
 
@@ -93,8 +92,22 @@ export class Board {
         })
     }
 
-    public addPiece(pieceType: PieceType, pos: BoardPosition): Piece {
+    public getEmptyPositions(): BoardPosition[]{
+        let emptyBoardPositions: BoardPosition[] = []
 
+        for(let x = 0; x < this.resolution; x++){
+            for(let y = 0; y < this.resolution; y++) {
+                let pos = {x: x, y: y}
+                let stringPos = JSON.stringify(pos)
+                if(!this.posToPieceMap.has(stringPos)) {
+                    emptyBoardPositions.push(pos)
+                }
+            }
+        }
+        return emptyBoardPositions;
+    }
+
+    public addPiece(pieceType: PieceType, pos: BoardPosition): Piece {
         let stringPos = JSON.stringify(pos)
         if(this.posToPieceMap.has(stringPos)) {
             throw new Error("piece already placed at position. Cannot add piece.");
@@ -130,7 +143,7 @@ export class Board {
     public getPiecePos(piece: Piece): BoardPosition {
         let boardPos = null;
         this.posToPieceMap.forEach((currentPiece, currentStringPos) => {
-            if(currentPiece == piece){
+            if(currentPiece == piece) {
                 boardPos = JSON.parse(currentStringPos)
             }
         })
@@ -270,7 +283,7 @@ export function getTowerMoves(piece: Piece, board: Board): BoardPosition[] {
     for (let i = pos.x + 1; i < boardSize; i++) {
         const currentPos = { x: i, y: pos.y };
 
-        if (boardPosToPieces.has(JSON.stringify(currentPos))){
+        if (boardPosToPieces.has(JSON.stringify(currentPos))) {
             validMoves.push(currentPos)
             break;
         }

@@ -23,19 +23,47 @@ export class Piece {
     }
 }
 
+export class Color {
+    public r: number;
+    public g: number;
+    public b: number;
+    public a: number;
+
+    constructor(r: number, g: number, b: number, a:number) {
+        this.r = r
+        this.g = g
+        this.b = b
+        this.a = a
+    }
+
+    combine(color: Color): Color {
+        let r = Math.min(this.r + color.r, 255)
+        let g = Math.min(this.g + color.g, 255)
+        let b = Math.min(this.b + color.b, 255)
+        let a = Math.min(this.a + color.a, 255)
+
+        return new Color(r,g,b,a)
+    }
+
+    getString(): string {
+        return `rgba(${this.r},${this.g},${this.b},${this.a})`
+    }
+}
+
 export class Board {
     public resolution: number
     public squareSize: number
     public ctx: CanvasRenderingContext2D
 
     private posToPieceMap: Map<string, Piece> = new Map<string, Piece>()
-    private color1: string
-    private color2: string
+    private color1: Color
+    private color2: Color
 
+    //===================================================================== Board construction
     constructor(resolution, size, ctx) {
         this.ctx = ctx
-        this.color1 = 'red'
-        this.color2 = 'blue'
+        this.color1 = new Color(118,150,86,1)
+        this.color2 = new Color(238,238,210,1)
         this.resolution = resolution
         this.squareSize = (size / resolution)
     }
@@ -58,6 +86,7 @@ export class Board {
         return copyBoard
     }
 
+    //===================================================================== Draw
     public drawBoard(): void {
         for (let y = 0; y < this.resolution; y++) {
             for (let x = 0; x < this.resolution; x++) {
@@ -71,14 +100,9 @@ export class Board {
         })
     }
 
-    public setColors(oddColor: string, evenColor: string): void {
-        this.color1 = oddColor
-        this.color2 = evenColor
-    }
-
-    public drawBlockWithColor(x: number, y: number, color: string): void {
+    public drawBlockWithColor(x: number, y: number, color: Color): void {
         if (this.isValidBlock(x, y)) {
-            this.ctx.fillStyle = color
+            this.ctx.fillStyle = color.getString()
             this.ctx.fillRect(this.squareSize * x, this.squareSize * y, this.squareSize, this.squareSize)
         }
         else {
@@ -86,12 +110,49 @@ export class Board {
         }
     }
 
-    public drawblocksWithColor(blocks: BoardPosition[], color: string): void {
+    public drawblocksWithColor(blocks: BoardPosition[], color: Color): void {
         blocks.forEach(x => {
             this.drawBlockWithColor(x.x, x.y, color)
         })
     }
 
+    public applyColorToBlock(block: BoardPosition, color: Color): void {
+        let blockColor = this.GetColorForBlock(block)
+        color = color.combine(blockColor)
+
+        this.drawBlockWithColor(block.x, block.y, color)
+    }
+
+    public applyColorToBlocks(blocks: BoardPosition[], color: Color): void {
+        blocks.forEach((pos) => {
+            this.applyColorToBlock(pos, color)
+        })
+    }
+
+    public setColors(oddColor: Color, evenColor: Color): void {
+        this.color1 = oddColor
+        this.color2 = evenColor
+    }
+
+    public highlightAttackingPositions(piece: Piece, color: Color = null): void {
+        if(color == null) {
+            color = new Color(80, -30, -30, 0)
+        }
+
+        let attackingPositions = this.getAttackingPositions(piece)
+        this.applyColorToBlocks(attackingPositions, color)
+    }
+
+    public highlightValidMoves(piece: Piece, color: Color = null): void {
+        if(color == null) {
+            color = new Color(40, 10, -50, 0)
+        }
+
+        let validMoves = piece.pieceType.getValidMoves(piece, this)
+        this.applyColorToBlocks(validMoves, color)
+    }
+
+    //===================================================================== Board and pieces
     public getEmptyPositions(): BoardPosition[]{
         let emptyBoardPositions: BoardPosition[] = []
 
@@ -187,16 +248,6 @@ export class Board {
         return this.posToPieceMap;
     }
 
-    public highlightAttackingPositions(piece: Piece, color: string): void {
-        let attackingPositions = this.getAttackingPositions(piece)
-        this.drawblocksWithColor(attackingPositions, color)
-    }
-
-    public highlightValidMoves(piece: Piece, color: string): void {
-        let validMoves = piece.pieceType.getValidMoves(piece, this)
-        this.drawblocksWithColor(validMoves, color)
-    }
-
     public getPieces(): Piece[] {
         let pieces = []
         this.posToPieceMap.forEach(piece => {
@@ -210,9 +261,8 @@ export class Board {
         return (x > -1 && x < this.resolution && y > -1 && y < this.resolution)
     }
 
-    private GetColorForBlock(pos: BoardPosition): string {
-        
-        let color = ''
+    private GetColorForBlock(pos: BoardPosition): Color {
+        let color: Color;
 
         if (pos.y % 2 == 0) {
             if (pos.x % 2 == 0) {

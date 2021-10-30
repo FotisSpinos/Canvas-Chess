@@ -153,10 +153,10 @@ export class Board {
     }
 
     //===================================================================== Board and pieces
-    public getEmptyPositions(): BoardPosition[]{
+    public getEmptyPositions(): BoardPosition[] {
         let emptyBoardPositions: BoardPosition[] = []
 
-        for(let x = 0; x < this.resolution; x++){
+        for(let x = 0; x < this.resolution; x++) {
             for(let y = 0; y < this.resolution; y++) {
                 let pos = {x: x, y: y}
                 let stringPos = JSON.stringify(pos)
@@ -165,7 +165,7 @@ export class Board {
                 }
             }
         }
-        return emptyBoardPositions;
+        return emptyBoardPositions
     }
 
     public addPiece(pieceType: PieceType, pos: BoardPosition): Piece {
@@ -180,18 +180,14 @@ export class Board {
     }
 
     public movePiece(piece: Piece, pos: BoardPosition): boolean {
-        let boardPositions = this.posToPieceMap.keys()
+        let isEmptySpace = this.getPieceAtPos(pos) == null 
+        let piecePos = this.getPiecePos(piece)
 
-        for(let i = 0; i < this.posToPieceMap.size; i++) {
-            let currentStringPos = boardPositions.next().value
-            let isEmptySpace = this.getPieceAtPos(pos) == null 
-            
-            if(isEmptySpace) {
-                this.posToPieceMap.delete(currentStringPos)
+        if(isEmptySpace) {
+            this.posToPieceMap.delete(JSON.stringify(piecePos))
 
-                this.posToPieceMap.set(JSON.stringify(pos), piece)
-                return true
-            }
+            this.posToPieceMap.set(JSON.stringify(pos), piece)
+            return true
         }
         return false
     }

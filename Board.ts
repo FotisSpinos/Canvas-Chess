@@ -76,6 +76,7 @@ export class Board {
         copyBoard.color1 = this.color1
         copyBoard.color2 = this.color2
         copyBoard.squareSize = this.squareSize
+        copyBoard.normalizedPieceSize = this.normalizedPieceSize
 
         let copyPosToPieceMap = new Map<string, Piece>()
 

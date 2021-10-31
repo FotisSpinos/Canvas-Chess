@@ -59,6 +59,8 @@ export class Board {
     private color1: Color
     private color2: Color
 
+    private normalizedPieceSize: number
+
     //===================================================================== Board construction
     constructor(resolution, size, ctx) {
         this.ctx = ctx
@@ -66,6 +68,7 @@ export class Board {
         this.color2 = new Color(238,238,210,1)
         this.resolution = resolution
         this.squareSize = (size / resolution)
+        this.normalizedPieceSize = 0.5
     }
 
     public copy(): Board {
@@ -87,6 +90,12 @@ export class Board {
     }
 
     //===================================================================== Draw
+
+    public setNormalizedPieceSize(pieceSize: number): void {
+        this.normalizedPieceSize = clamp(pieceSize, 0, 1)
+        console.log('set number:', this.normalizedPieceSize)
+    }
+
     public drawBoard(): void {
         for (let y = 0; y < this.resolution; y++) {
             for (let x = 0; x < this.resolution; x++) {
@@ -281,7 +290,13 @@ export class Board {
 
     private drawPiece(piece: Piece, stringPos: string){
         let pos: BoardPosition = JSON.parse(stringPos)
-        this.ctx.drawImage(piece.pieceType.image, this.squareSize * pos.x, this.squareSize * pos.y, this.squareSize, this.squareSize)
+        let scale = this.squareSize * this.normalizedPieceSize
+
+        this.ctx.drawImage(piece.pieceType.image,
+            this.squareSize * pos.x + scale / 2,
+            this.squareSize * pos.y + scale / 2,
+            scale,
+            scale)
     }
 }
 
@@ -342,4 +357,8 @@ export function getTowerMoves(piece: Piece, board: Board): BoardPosition[] {
     }
 
     return validMoves
+}
+
+function clamp(value: number, min: number, max: number): number {
+    return Math.min(Math.max(value, min), max);
 }

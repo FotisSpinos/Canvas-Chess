@@ -59,6 +59,8 @@ export class Board {
     private color1: Color
     private color2: Color
 
+    private normalizedPieceSize: number
+
     //===================================================================== Board construction
     constructor(resolution, size, ctx) {
         this.ctx = ctx
@@ -66,6 +68,7 @@ export class Board {
         this.color2 = new Color(238,238,210,1)
         this.resolution = resolution
         this.squareSize = (size / resolution)
+        this.normalizedPieceSize = 1
     }
 
     public copy(): Board {
@@ -73,6 +76,7 @@ export class Board {
         copyBoard.color1 = this.color1
         copyBoard.color2 = this.color2
         copyBoard.squareSize = this.squareSize
+        copyBoard.normalizedPieceSize = this.normalizedPieceSize
 
         let copyPosToPieceMap = new Map<string, Piece>()
 
@@ -87,6 +91,11 @@ export class Board {
     }
 
     //===================================================================== Draw
+
+    public setNormalizedPieceSize(pieceSize: number): void {
+        this.normalizedPieceSize = clamp(pieceSize, 0, 1)
+    }
+
     public drawBoard(): void {
         for (let y = 0; y < this.resolution; y++) {
             for (let x = 0; x < this.resolution; x++) {
@@ -95,8 +104,7 @@ export class Board {
         }
 
         this.posToPieceMap.forEach((piece, stringPos) => {
-            let pos: BoardPosition = JSON.parse(stringPos)
-            this.ctx.drawImage(piece.pieceType.image, this.squareSize * pos.x, this.squareSize * pos.y, this.squareSize, this.squareSize)
+            this.drawPiece(piece, stringPos)
         })
     }
 
@@ -279,6 +287,17 @@ export class Board {
         
         return color
     }
+
+    private drawPiece(piece: Piece, stringPos: string){
+        let pos: BoardPosition = JSON.parse(stringPos)
+        let scale = this.squareSize * this.normalizedPieceSize
+        let offset = this.squareSize / 2 - scale / 2
+        this.ctx.drawImage(piece.pieceType.image,
+            this.squareSize * pos.x + offset,
+            this.squareSize * pos.y + offset,
+            scale,
+            scale)
+    }
 }
 
 export function getTowerMoves(piece: Piece, board: Board): BoardPosition[] {
@@ -338,4 +357,8 @@ export function getTowerMoves(piece: Piece, board: Board): BoardPosition[] {
     }
 
     return validMoves
+}
+
+function clamp(value: number, min: number, max: number): number {
+    return Math.min(Math.max(value, min), max);
 }

@@ -95,8 +95,7 @@ export class Board {
         }
 
         this.posToPieceMap.forEach((piece, stringPos) => {
-            let pos: BoardPosition = JSON.parse(stringPos)
-            this.ctx.drawImage(piece.pieceType.image, this.squareSize * pos.x, this.squareSize * pos.y, this.squareSize, this.squareSize)
+            this.drawPiece(piece, stringPos)
         })
     }
 
@@ -278,6 +277,11 @@ export class Board {
         }
         
         return color
+    }
+
+    private drawPiece(piece: Piece, stringPos: string){
+        let pos: BoardPosition = JSON.parse(stringPos)
+        this.ctx.drawImage(piece.pieceType.image, this.squareSize * pos.x, this.squareSize * pos.y, this.squareSize, this.squareSize)
     }
 }
 

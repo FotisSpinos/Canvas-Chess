@@ -68,7 +68,7 @@ export class Board {
         this.color2 = new Color(238,238,210,1)
         this.resolution = resolution
         this.squareSize = (size / resolution)
-        this.normalizedPieceSize = 0.5
+        this.normalizedPieceSize = 1
     }
 
     public copy(): Board {
@@ -93,7 +93,6 @@ export class Board {
 
     public setNormalizedPieceSize(pieceSize: number): void {
         this.normalizedPieceSize = clamp(pieceSize, 0, 1)
-        console.log('set number:', this.normalizedPieceSize)
     }
 
     public drawBoard(): void {
@@ -291,10 +290,10 @@ export class Board {
     private drawPiece(piece: Piece, stringPos: string){
         let pos: BoardPosition = JSON.parse(stringPos)
         let scale = this.squareSize * this.normalizedPieceSize
-
+        let offset = this.squareSize / 2 - scale / 2
         this.ctx.drawImage(piece.pieceType.image,
-            this.squareSize * pos.x + scale / 2,
-            this.squareSize * pos.y + scale / 2,
+            this.squareSize * pos.x + offset,
+            this.squareSize * pos.y + offset,
             scale,
             scale)
     }

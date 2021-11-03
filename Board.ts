@@ -359,6 +359,80 @@ export function getTowerMoves(piece: Piece, board: Board): BoardPosition[] {
     return validMoves
 }
 
+export function getBishopMoves(piece: Piece, board: Board): BoardPosition[] {
+    let validMoves: BoardPosition[] = [];
+
+    let pos = board.getPiecePos(piece)
+    let boardPosToPieces = board.getPosToPieceMap()
+
+    let boardSize = board.resolution - 1
+    
+    let topLeftCorner = {x: 0, y: 0};
+    let topRightCorner = {x: boardSize, y: 0}
+    let bottomLeftCorner = {x: 0, y: boardSize}
+    let bottomRightCorner = {x: boardSize, y: boardSize}
+
+    let topLeftSteps = Math.min(Math.abs(topLeftCorner.x - pos.x), Math.abs(topLeftCorner.y - pos.y))
+    let topRightSteps = Math.min(Math.abs(topRightCorner.x - pos.x), Math.abs(topRightCorner.y - pos.y))
+    let bottomLeftSteps = Math.min(Math.abs(bottomLeftCorner.x - pos.x), Math.abs(bottomLeftCorner.y - pos.y))
+    let bottomRightSteps = Math.min(Math.abs(bottomRightCorner.x - pos.x), Math.abs(bottomRightCorner.y - pos.y))
+
+    let currentPos = pos;
+    // add top left positions
+    for(let i = 0; i < topLeftSteps; i++) {
+        currentPos = {x: currentPos.x - 1, y: currentPos.y - 1}
+
+        if (boardPosToPieces.has(JSON.stringify(currentPos))) {
+            validMoves.push(currentPos)
+            break;
+        }
+
+        validMoves.push(currentPos)
+    }
+
+    currentPos = pos;
+    // add top right positions
+    for(let i = 0; i < topRightSteps; i++) {
+        currentPos = {x: currentPos.x + 1, y: currentPos.y - 1}
+
+        if (boardPosToPieces.has(JSON.stringify(currentPos))) {
+            validMoves.push(currentPos)
+            break;
+        }
+
+        validMoves.push(currentPos)
+    }
+
+
+    currentPos = pos;
+    // add bottom left positions
+    for(let i = 0; i < bottomLeftSteps; i++) {
+        currentPos = {x: currentPos.x - 1, y: currentPos.y + 1}
+
+        if (boardPosToPieces.has(JSON.stringify(currentPos))) {
+            validMoves.push(currentPos)
+            break;
+        }
+
+        validMoves.push(currentPos)
+    }
+
+    currentPos = pos;
+    // add bottom right positions
+    for(let i = 0; i < bottomRightSteps; i++) {
+        currentPos = {x: currentPos.x + 1, y: currentPos.y + 1}
+
+        if (boardPosToPieces.has(JSON.stringify(currentPos))) {
+            validMoves.push(currentPos)
+            break;
+        }
+
+        validMoves.push(currentPos)
+    }
+
+    return validMoves
+}
+
 function clamp(value: number, min: number, max: number): number {
-    return Math.min(Math.max(value, min), max);
+    return Math.min(Math.max(value, min), max)
 }

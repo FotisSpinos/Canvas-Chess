@@ -433,6 +433,11 @@ export function getBishopMoves(piece: Piece, board: Board): BoardPosition[] {
     return validMoves
 }
 
+export function getQueenMoves(piece: Piece, board: Board): BoardPosition[] {
+    let validMoves: BoardPosition[] = [];
+    return validMoves.concat(getTowerMoves(piece, board), getBishopMoves(piece, board))
+}
+
 function clamp(value: number, min: number, max: number): number {
     return Math.min(Math.max(value, min), max)
 }

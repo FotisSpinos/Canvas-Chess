@@ -261,7 +261,7 @@ export class Board {
         return pieces
     }
 
-    private isValidBlock(x: number, y: number): boolean {
+    public isValidBlock(x: number, y: number): boolean {
         return (x > -1 && x < this.resolution && y > -1 && y < this.resolution)
     }
 
@@ -436,6 +436,35 @@ export function getBishopMoves(piece: Piece, board: Board): BoardPosition[] {
 export function getQueenMoves(piece: Piece, board: Board): BoardPosition[] {
     let validMoves: BoardPosition[] = [];
     return validMoves.concat(getTowerMoves(piece, board), getBishopMoves(piece, board))
+}
+
+export function getKnightMoves(piece: Piece, board:Board): BoardPosition[] {
+    let pos = board.getPiecePos(piece)
+    let validMoves: BoardPosition[] = [];
+
+    let leftTopPos = {x: pos.x - 2, y: pos.y - 1}
+    let topLeftPos = {x: pos.x - 1, y: pos.y - 2}
+
+    let rightTopPos = {x: pos.x + 2, y: pos.y - 1}
+    let topRightPos = {x: pos.x + 1, y: pos.y - 2}
+
+    let leftBottomPos = {x: pos.x - 2, y: pos.y + 1}
+    let bottomLeftPos = {x: pos.x - 1, y: pos.y + 2}
+
+    let rightBottomPos = {x: pos.x + 2, y: pos.y + 1}
+    let bottomRightPos = {x: pos.x + 1, y: pos.y + 2}
+
+    function addIfValidPos(positions) {
+        positions.forEach(pos => {
+            if(board.isValidBlock(pos.x, pos.y)) {
+                validMoves.push(pos)
+            }
+        });
+    }
+
+    addIfValidPos([leftTopPos, topLeftPos, rightTopPos, topRightPos, leftBottomPos, bottomLeftPos, rightBottomPos, bottomRightPos])
+
+    return validMoves
 }
 
 function clamp(value: number, min: number, max: number): number {

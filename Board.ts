@@ -467,6 +467,30 @@ export function getKnightMoves(piece: Piece, board:Board): BoardPosition[] {
     return validMoves
 }
 
+export function getPawnMoves(piece: Piece, board: Board): BoardPosition[] {
+    let pos = board.getPiecePos(piece)
+    let validMoves: BoardPosition[] = [];
+    let boardPosToPieces = board.getPosToPieceMap()
+
+    let upPos = {x: pos.x, y: pos.y - 1}
+    let topLeftPos = {x: upPos.x - 1, y: upPos.y} 
+    let topRightPos = {x: upPos.x + 1, y: upPos.y}
+
+    if (upPos.y < board.resolution && !boardPosToPieces.has(JSON.stringify(upPos))) {
+        validMoves.push(upPos)
+    }
+
+    if (boardPosToPieces.has(JSON.stringify(topLeftPos))) {
+        validMoves.push(topLeftPos)
+    }
+
+    if (boardPosToPieces.has(JSON.stringify(topRightPos))) {
+        validMoves.push(topRightPos)
+    }
+
+    return validMoves
+}
+
 function clamp(value: number, min: number, max: number): number {
     return Math.min(Math.max(value, min), max)
 }

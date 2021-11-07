@@ -440,7 +440,6 @@ export function getQueenMoves(piece: Piece, board: Board): BoardPosition[] {
 
 export function getKnightMoves(piece: Piece, board:Board): BoardPosition[] {
     let pos = board.getPiecePos(piece)
-    let validMoves: BoardPosition[] = [];
 
     let leftTopPos = {x: pos.x - 2, y: pos.y - 1}
     let topLeftPos = {x: pos.x - 1, y: pos.y - 2}
@@ -454,17 +453,8 @@ export function getKnightMoves(piece: Piece, board:Board): BoardPosition[] {
     let rightBottomPos = {x: pos.x + 2, y: pos.y + 1}
     let bottomRightPos = {x: pos.x + 1, y: pos.y + 2}
 
-    function addIfValidPos(positions) {
-        positions.forEach(pos => {
-            if(board.isValidBlock(pos.x, pos.y)) {
-                validMoves.push(pos)
-            }
-        });
-    }
-
-    addIfValidPos([leftTopPos, topLeftPos, rightTopPos, topRightPos, leftBottomPos, bottomLeftPos, rightBottomPos, bottomRightPos])
-
-    return validMoves
+    return getValidPositions(board, 
+        [leftTopPos, topLeftPos, rightTopPos, topRightPos, leftBottomPos, bottomLeftPos, rightBottomPos, bottomRightPos])
 }
 
 export function getPawnMoves(piece: Piece, board: Board): BoardPosition[] {
@@ -487,6 +477,36 @@ export function getPawnMoves(piece: Piece, board: Board): BoardPosition[] {
     if (boardPosToPieces.has(JSON.stringify(topRightPos))) {
         validMoves.push(topRightPos)
     }
+
+    return validMoves
+}
+
+export function getKingMoves(piece: Piece, board: Board): BoardPosition[] {
+    let pos = board.getPiecePos(piece)
+
+    let upPos = {x: pos.x, y: pos.y - 1}
+    let downPos = {x: pos.x, y: pos.y + 1}
+    let rightPos = {x: pos.x + 1, y: pos.y}
+    let leftPos = {x: pos.x - 1, y: pos.y}
+
+    let topLeftPos = {x: pos.x - 1, y: pos.y - 1}
+    let topRightPos = {x: pos.x + 1, y: pos.y - 1}
+
+    let bottomLeftPos = {x: pos.x - 1, y: pos.y + 1}
+    let bottomRightPos = {x: pos.x + 1, y: pos.y + 1}
+
+    return getValidPositions(board, 
+        [upPos, downPos, rightPos, leftPos, topLeftPos, topRightPos, bottomLeftPos, bottomRightPos])
+}
+
+function getValidPositions(board:Board, positions: BoardPosition[]) :BoardPosition[] {
+    let validMoves: BoardPosition[] = [];
+
+    positions.forEach(pos => {
+        if(board.isValidBlock(pos.x, pos.y)) {
+            validMoves.push(pos)
+        }
+    });
 
     return validMoves
 }

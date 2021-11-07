@@ -99,7 +99,7 @@ export class Board {
     public drawBoard(): void {
         for (let y = 0; y < this.resolution; y++) {
             for (let x = 0; x < this.resolution; x++) {
-                this.drawBlockWithColor(x, y, this.GetColorForBlock({x, y}))
+                this.drawBlockWithColor({x, y}, this.GetColorForBlock({x, y}))
             }
         }
 
@@ -108,15 +108,16 @@ export class Board {
         })
     }
 
-    public drawBlockWithColor(x: number, y: number, color: Color): void {
-        this.ThrowIfInvalidPos(x, y)
+    public drawBlockWithColor(pos: BoardPosition, color: Color): void {
+        this.ThrowIfInvalidPos(pos)
+
         this.ctx.fillStyle = color.getString()
-        this.ctx.fillRect(this.squareSize * x, this.squareSize * y, this.squareSize, this.squareSize)
+        this.ctx.fillRect(this.squareSize * pos.x, this.squareSize * pos.y, this.squareSize, this.squareSize)
     }
 
     public drawblocksWithColor(blocks: BoardPosition[], color: Color): void {
         blocks.forEach(x => {
-            this.drawBlockWithColor(x.x, x.y, color)
+            this.drawBlockWithColor(x, color)
         })
     }
 
@@ -124,7 +125,7 @@ export class Board {
         let blockColor = this.GetColorForBlock(block)
         color = color.combine(blockColor)
 
-        this.drawBlockWithColor(block.x, block.y, color)
+        this.drawBlockWithColor(block, color)
     }
 
     public applyColorToBlocks(blocks: BoardPosition[], color: Color): void {
@@ -297,9 +298,13 @@ export class Board {
 
     //===================================================================== Error check functions
 
-    private ThrowIfInvalidPos(x: number, y:number): void {
-        if(!this.isValidBlock(x, y)) {
-            throw Error('Invalid board position' + x + ' ' + y)
+    private ThrowIfInvalidPos(pos: BoardPosition): void {
+        if(!pos) {
+            throw Error('Invalid position referecen')
+        }
+
+        if(!this.isValidBlock(pos.x, pos.y)) {
+            throw Error('Invalid board position' + pos.x + ' ' + pos.y)
         }
     }
 }

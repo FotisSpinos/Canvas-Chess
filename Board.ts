@@ -63,6 +63,18 @@ export class Board {
 
     //===================================================================== Board construction
     constructor(resolution, size, ctx) {
+        if(resolution < 0){
+            throw new Error("Invalid argument, resolution cannot be negative");
+        }
+
+        if(size < 0){
+            throw new Error("Invalid argument, size cannot be negative");
+        }
+
+        if(!ctx){
+            throw new Error("Invalid argument, 2D rendering context cannot be undefined");
+        }
+
         this.ctx = ctx
         this.color1 = new Color(118,150,86,1)
         this.color2 = new Color(238,238,210,1)
@@ -99,7 +111,7 @@ export class Board {
     public drawBoard(): void {
         for (let y = 0; y < this.resolution; y++) {
             for (let x = 0; x < this.resolution; x++) {
-                this.drawBlockWithColor(x, y, this.GetColorForBlock({x, y}))
+                this.drawBlockWithColor({x, y}, this.GetColorForBlock({x, y}))
             }
         }
 
@@ -108,27 +120,26 @@ export class Board {
         })
     }
 
-    public drawBlockWithColor(x: number, y: number, color: Color): void {
-        if (this.isValidBlock(x, y)) {
-            this.ctx.fillStyle = color.getString()
-            this.ctx.fillRect(this.squareSize * x, this.squareSize * y, this.squareSize, this.squareSize)
-        }
-        else {
-            throw Error('block is not valid' + x + ' ' + y)
-        }
+    public drawBlockWithColor(pos: BoardPosition, color: Color): void {
+        this.throwIfUndefinedColor(color)
+        this.throwIfInvalidPos(pos)
+
+        this.ctx.fillStyle = color.getString()
+        this.ctx.fillRect(this.squareSize * pos.x, this.squareSize * pos.y, this.squareSize, this.squareSize)
     }
 
-    public drawblocksWithColor(blocks: BoardPosition[], color: Color): void {
+    public drawblocksWithColor(blocks: BoardPosition[], color: Color = null): void {
         blocks.forEach(x => {
-            this.drawBlockWithColor(x.x, x.y, color)
+            this.drawBlockWithColor(x, color)
         })
     }
 
     public applyColorToBlock(block: BoardPosition, color: Color): void {
+
         let blockColor = this.GetColorForBlock(block)
         color = color.combine(blockColor)
 
-        this.drawBlockWithColor(block.x, block.y, color)
+        this.drawBlockWithColor(block, color)
     }
 
     public applyColorToBlocks(blocks: BoardPosition[], color: Color): void {
@@ -143,7 +154,7 @@ export class Board {
     }
 
     public highlightAttackingPositions(piece: Piece, color: Color = null): void {
-        if(color == null) {
+        if(!color) {
             color = new Color(80, -30, -30, 0)
         }
 
@@ -152,7 +163,7 @@ export class Board {
     }
 
     public highlightValidMoves(piece: Piece, color: Color = null): void {
-        if(color == null) {
+        if(!color) {
             color = new Color(40, 10, -50, 0)
         }
 
@@ -177,27 +188,24 @@ export class Board {
     }
 
     public addPiece(pieceType: PieceType, pos: BoardPosition): Piece {
-        let stringPos = JSON.stringify(pos)
-        if(this.posToPieceMap.has(stringPos)) {
-            throw new Error("piece already placed at position. Cannot add piece.");
+        this.throwIfInvalidPos(pos)
+        this.throwIfPieceExists(pos)
+        
+        if(!pieceType) {
+            throw new Error("Invalid argument. PieceType should not be undefined");
+            
         }
-        let piece = new Piece(pieceType)
-        this.posToPieceMap.set(stringPos, piece)
 
-        return piece;
+        return this.addPieceUnsafe(pieceType, pos)
     }
 
-    public movePiece(piece: Piece, pos: BoardPosition): boolean {
-        let isEmptySpace = this.getPieceAtPos(pos) == null 
+    public movePiece(piece: Piece, pos: BoardPosition): void {
+        this.throwIfInvalidPos(pos)
+        this.throwIfPieceExists(pos)
         let piecePos = this.getPiecePos(piece)
 
-        if(isEmptySpace) {
-            this.posToPieceMap.delete(JSON.stringify(piecePos))
-
-            this.posToPieceMap.set(JSON.stringify(pos), piece)
-            return true
-        }
-        return false
+        this.posToPieceMap.delete(JSON.stringify(piecePos))
+        this.posToPieceMap.set(JSON.stringify(pos), piece)
     }
 
     public getPieceAtPos(pos: BoardPosition): Piece {
@@ -297,6 +305,40 @@ export class Board {
             this.squareSize * pos.y + offset,
             scale,
             scale)
+    }
+
+    private addPieceUnsafe(pieceType: PieceType, pos: BoardPosition): Piece {
+        let stringPos = JSON.stringify(pos)
+
+        let piece = new Piece(pieceType)
+        this.posToPieceMap.set(stringPos, piece)
+
+        return piece
+    }
+
+    //===================================================================== Error check functions
+
+    private throwIfInvalidPos(pos: BoardPosition): void {
+        if(!pos) {
+            throw Error('Invalid position referecen')
+        }
+
+        if(!this.isValidBlock(pos.x, pos.y)) {
+            throw Error('Invalid board position' + pos.x + ' ' + pos.y)
+        }
+    }
+
+    private throwIfPieceExists(pos: BoardPosition){
+        let stringPos = JSON.stringify(pos)
+        if(this.posToPieceMap.has(stringPos)) {
+            throw new Error("piece already placed at position. Cannot add piece.");
+        }
+    }
+
+    private throwIfUndefinedColor(color: Color) {
+        if(!color) {
+            throw new Error("Invalid argument: color is undefined");
+        }
     }
 }
 

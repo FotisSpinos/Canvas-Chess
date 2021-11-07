@@ -149,7 +149,7 @@ export class Board {
     }
 
     public highlightValidMoves(piece: Piece, color: Color = null): void {
-        if(color == null) {
+        if(color) {
             color = new Color(40, 10, -50, 0)
         }
 

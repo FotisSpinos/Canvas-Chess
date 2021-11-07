@@ -120,9 +120,8 @@ export class Board {
         })
     }
 
-    public drawBlockWithColor(pos: BoardPosition, color: Color = null): void {
+    public drawBlockWithColor(pos: BoardPosition, color: Color): void {
         this.throwIfUndefinedColor(color)
-
         this.throwIfInvalidPos(pos)
 
         this.ctx.fillStyle = color.getString()

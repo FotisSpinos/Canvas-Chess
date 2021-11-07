@@ -140,7 +140,7 @@ export class Board {
     }
 
     public highlightAttackingPositions(piece: Piece, color: Color = null): void {
-        if(color == null) {
+        if(!color) {
             color = new Color(80, -30, -30, 0)
         }
 

@@ -63,6 +63,18 @@ export class Board {
 
     //===================================================================== Board construction
     constructor(resolution, size, ctx) {
+        if(resolution < 0){
+            throw new Error("Invalid argument, resolution cannot be negative");
+        }
+
+        if(size < 0){
+            throw new Error("Invalid argument, size cannot be negative");
+        }
+
+        if(!ctx){
+            throw new Error("Invalid argument, 2D rendering context cannot be undefined");
+        }
+
         this.ctx = ctx
         this.color1 = new Color(118,150,86,1)
         this.color2 = new Color(238,238,210,1)
@@ -108,20 +120,23 @@ export class Board {
         })
     }
 
-    public drawBlockWithColor(pos: BoardPosition, color: Color): void {
+    public drawBlockWithColor(pos: BoardPosition, color: Color = null): void {
+        this.throwIfUndefinedColor(color)
+
         this.ThrowIfInvalidPos(pos)
 
         this.ctx.fillStyle = color.getString()
         this.ctx.fillRect(this.squareSize * pos.x, this.squareSize * pos.y, this.squareSize, this.squareSize)
     }
 
-    public drawblocksWithColor(blocks: BoardPosition[], color: Color): void {
+    public drawblocksWithColor(blocks: BoardPosition[], color: Color = null): void {
         blocks.forEach(x => {
             this.drawBlockWithColor(x, color)
         })
     }
 
     public applyColorToBlock(block: BoardPosition, color: Color): void {
+
         let blockColor = this.GetColorForBlock(block)
         color = color.combine(blockColor)
 
@@ -149,7 +164,7 @@ export class Board {
     }
 
     public highlightValidMoves(piece: Piece, color: Color = null): void {
-        if(color) {
+        if(!color) {
             color = new Color(40, 10, -50, 0)
         }
 
@@ -305,6 +320,12 @@ export class Board {
 
         if(!this.isValidBlock(pos.x, pos.y)) {
             throw Error('Invalid board position' + pos.x + ' ' + pos.y)
+        }
+    }
+
+    private throwIfUndefinedColor(color: Color) {
+        if(!color) {
+            throw new Error("Invalid argument: color is undefined");
         }
     }
 }

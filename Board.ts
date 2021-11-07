@@ -123,7 +123,7 @@ export class Board {
     public drawBlockWithColor(pos: BoardPosition, color: Color = null): void {
         this.throwIfUndefinedColor(color)
 
-        this.ThrowIfInvalidPos(pos)
+        this.throwIfInvalidPos(pos)
 
         this.ctx.fillStyle = color.getString()
         this.ctx.fillRect(this.squareSize * pos.x, this.squareSize * pos.y, this.squareSize, this.squareSize)
@@ -189,6 +189,8 @@ export class Board {
     }
 
     public addPiece(pieceType: PieceType, pos: BoardPosition): Piece {
+        this.throwIfInvalidPos(pos)
+
         let stringPos = JSON.stringify(pos)
         if(this.posToPieceMap.has(stringPos)) {
             throw new Error("piece already placed at position. Cannot add piece.");
@@ -313,7 +315,7 @@ export class Board {
 
     //===================================================================== Error check functions
 
-    private ThrowIfInvalidPos(pos: BoardPosition): void {
+    private throwIfInvalidPos(pos: BoardPosition): void {
         if(!pos) {
             throw Error('Invalid position referecen')
         }

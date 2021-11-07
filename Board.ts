@@ -109,13 +109,9 @@ export class Board {
     }
 
     public drawBlockWithColor(x: number, y: number, color: Color): void {
-        if (this.isValidBlock(x, y)) {
-            this.ctx.fillStyle = color.getString()
-            this.ctx.fillRect(this.squareSize * x, this.squareSize * y, this.squareSize, this.squareSize)
-        }
-        else {
-            throw Error('block is not valid' + x + ' ' + y)
-        }
+        this.ThrowIfInvalidPos(x, y)
+        this.ctx.fillStyle = color.getString()
+        this.ctx.fillRect(this.squareSize * x, this.squareSize * y, this.squareSize, this.squareSize)
     }
 
     public drawblocksWithColor(blocks: BoardPosition[], color: Color): void {
@@ -297,6 +293,14 @@ export class Board {
             this.squareSize * pos.y + offset,
             scale,
             scale)
+    }
+
+    //===================================================================== Error check functions
+
+    private ThrowIfInvalidPos(x: number, y:number): void {
+        if(!this.isValidBlock(x, y)) {
+            throw Error('Invalid board position' + x + ' ' + y)
+        }
     }
 }
 

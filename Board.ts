@@ -190,28 +190,23 @@ export class Board {
 
     public addPiece(pieceType: PieceType, pos: BoardPosition): Piece {
         this.throwIfInvalidPos(pos)
-
-        let stringPos = JSON.stringify(pos)
-        if(this.posToPieceMap.has(stringPos)) {
-            throw new Error("piece already placed at position. Cannot add piece.");
+        this.throwIfPieceExists(pos)
+        
+        if(!pieceType) {
+            throw new Error("Invalid argument. PieceType should not be undefined");
+            
         }
-        let piece = new Piece(pieceType)
-        this.posToPieceMap.set(stringPos, piece)
 
-        return piece;
+        return this.addPieceUnsafe(pieceType, pos)
     }
 
-    public movePiece(piece: Piece, pos: BoardPosition): boolean {
-        let isEmptySpace = this.getPieceAtPos(pos) == null 
+    public movePiece(piece: Piece, pos: BoardPosition): void {
+        this.throwIfInvalidPos(pos)
+        this.throwIfPieceExists(pos)
         let piecePos = this.getPiecePos(piece)
 
-        if(isEmptySpace) {
-            this.posToPieceMap.delete(JSON.stringify(piecePos))
-
-            this.posToPieceMap.set(JSON.stringify(pos), piece)
-            return true
-        }
-        return false
+        this.posToPieceMap.delete(JSON.stringify(piecePos))
+        this.posToPieceMap.set(JSON.stringify(pos), piece)
     }
 
     public getPieceAtPos(pos: BoardPosition): Piece {
@@ -313,6 +308,15 @@ export class Board {
             scale)
     }
 
+    private addPieceUnsafe(pieceType: PieceType, pos: BoardPosition): Piece {
+        let stringPos = JSON.stringify(pos)
+
+        let piece = new Piece(pieceType)
+        this.posToPieceMap.set(stringPos, piece)
+
+        return piece
+    }
+
     //===================================================================== Error check functions
 
     private throwIfInvalidPos(pos: BoardPosition): void {
@@ -322,6 +326,13 @@ export class Board {
 
         if(!this.isValidBlock(pos.x, pos.y)) {
             throw Error('Invalid board position' + pos.x + ' ' + pos.y)
+        }
+    }
+
+    private throwIfPieceExists(pos: BoardPosition){
+        let stringPos = JSON.stringify(pos)
+        if(this.posToPieceMap.has(stringPos)) {
+            throw new Error("piece already placed at position. Cannot add piece.");
         }
     }
 
